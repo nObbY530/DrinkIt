@@ -362,9 +362,9 @@ end
 
 function DrinkIt:ScanValue(desc, isPercent, key)
 	if (isPercent) then
-		return string.match(desc, '(%d*).?(%d*).?(%d+)%s-%%.-'..key:lower())
+		return string.match(desc, '(%d*).?(%d*).?(%d+)%s%%%s?[a-z()]-%s'..key:lower())
 	else
-		return string.match(desc, '(%d*).?(%d*).?(%d+).-'..key:lower())
+		return string.match(desc, '(%d*).?(%d*).?(%d+)%s?[a-z()]-%s'..key:lower())
 	end
 end
 
