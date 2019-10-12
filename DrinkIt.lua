@@ -300,7 +300,7 @@ function DrinkIt:Scan()
 
 	self:MacroEdit(MACRO_NAME_HEALTH, MACRO_BODY_HEALTH, (bests['conjref']['id'] or bests['conjfood']['id'] or bests['refresh']['id'] or bests['food']['id'] or bests['bandage']['id'] or bests['hstone']['id'] or bests['bpot']['id'] or bests['hpot']['id']), (bests['hpot']['id'] or bests['bpot']['id']), bests['hstone']['id'], bests['bandage']['id'], bests['home']['id'], bests['spell1']['name'])
 
-	self:MacroEdit(MACRO_NAME_MANA, MACRO_BODY_MANA, (bests['conjdrink']['id'] or bests['drink']['id'] or bests['mstone']['id'] or bests['mpot']['id'] or bests['bandage']['id']), (bests['mstone']['id'] or bests['mpot']['id']), bests['mstone']['id'], nil, bests['home']['id'], bests['spell2']['name'])
+	self:MacroEdit(MACRO_NAME_MANA, MACRO_BODY_MANA, (bests['conjdrink']['id'] or bests['drink']['id'] or bests['mstone']['id'] or bests['mpot']['id'] or bests['bandage']['id']), (bests['bpot']['id'] or bests['mpot']['id']), bests['mstone']['id'], nil, bests['home']['id'], bests['spell2']['name'])
 
 	dirty = false
 end
@@ -337,9 +337,9 @@ function DrinkIt:MacroEdit(name, substring, food, pot, stone, bandage, home, spe
 			if item then
 				if not isFirst then
 					body = body..','
-					isFirst = false
 				end
 				body = body..'item:'..item
+				isFirst = false
 			end
 		end
 		body = body..'\n'
