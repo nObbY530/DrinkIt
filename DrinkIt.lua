@@ -211,7 +211,7 @@ function DrinkIt:Scan()
 						------------
 						--Bandages--
 						------------
-						if string.match(spellName,L["first aid"]:lower()) and string.match(desc,L["heals"]:lower()) then
+						if (string.match(itemSubType,L["bandage"]:lower()) or string.match(spellName,L["first aid"]:lower())) and string.match(desc,L["heals"]:lower()) then
 							local isPercent, health, mana = self:ScanSpell(desc)
 							if health > 0 and mana == 0 and (not bests['bandage']['id'] or (bests['bandage']['id'] and ((not bests['bandage']['isPercent'] and isPercent) or (bests['bandage']['isPercent'] == isPercent and bests['bandage']['health'] < health)))) then
 								self:NewBest('bandage', itemID, itemCount, isPercent, health, mana)
@@ -347,7 +347,7 @@ function DrinkIt:MacroEdit(name, substring, food, pot, stone, bandage, home, spe
 
 	conds = '['
 	if pot or stone then conds = conds..'nocombat' end
-	if pot or stone and spell or bandage then conds = conds..',' end
+	if (pot or stone) and (spell or bandage) then conds = conds..',' end
 	if spell or bandage then conds = conds..nomod end
 	conds = conds..']'
 	if food then

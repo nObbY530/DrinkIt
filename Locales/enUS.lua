@@ -20,6 +20,7 @@ L["armor"] = true
 L["consumable"] = true
 L["miscellaneous"] = true
 L["potion"] = true
+L["bandage"] = true
 L["reagent"] = true
 L["restores"] = true
 L["restore"] = true
