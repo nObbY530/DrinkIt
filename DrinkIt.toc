@@ -1,0 +1,12 @@
+## Interface: 80205
+
+## Title: DrinkIt
+## Notes: Food/water macro generator
+## Author: nObbY
+## Version: 1.0
+
+Libraries\LibStub\LibStub.lua
+Libraries\AceLocale-3.0\AceLocale-3.0.lua
+Locales\enUS.lua
+Locales\deDE.lua
+DrinkIt.lua

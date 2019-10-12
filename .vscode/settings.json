@@ -1,0 +1,24 @@
+{
+    "Lua.diagnostics.globals": [
+        "SendSystemMessage",
+        "message",
+        "CreateFrame",
+        "GetNumMacros",
+        "IsLoggedIn",
+        "InCombatLockdown",
+        "UnitLevel",
+        "UnitClass",
+        "GetContainerNumSlots",
+        "GetContainerItemInfo",
+        "GetItemInfo",
+        "GetItemSpell",
+        "GetSpellDescription",
+        "EditMacro",
+        "GetMacroIndexByName",
+        "CreateMacro",
+        "self"
+    ],
+    "Lua.diagnostics.disable": [
+        "undefined-global"
+    ]
+}
