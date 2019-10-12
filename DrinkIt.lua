@@ -67,9 +67,6 @@ function DrinkIt:PLAYER_LOGIN()
 	self:RegisterEvent('ITEM_PUSH')
 	self:RegisterEvent('PLAYER_LEVEL_UP')
 
-	self:Print("Locale: "..(GetLocale() or ""))
-	self:Print(L["Created macro:"]..' \"'..MACRO_NAME_HEALTH..'\"')
-
 	-----------------
 	--Create Macros--
 	-----------------
@@ -85,7 +82,7 @@ function DrinkIt:PLAYER_LOGIN()
 	if GetMacroIndexByName(MACRO_NAME_MANA) == 0 then
 		if GetNumMacros() < MAX_ACCOUNT_MACROS then
 			CreateMacro(MACRO_NAME_MANA, 'INV_Misc_QuestionMark', MACRO_BODY_MANA)
-			self:Print(L["Created Macro:"]..' \"'..MACRO_NAME_MANA..'\"')
+			self:Print(L["Created macro:"]..' \"'..MACRO_NAME_MANA..'\"')
 		else
 			self:Print(L["Can't create new macro:"]..' \"'..MACRO_NAME_MANA..'\" '..L["Make enough space in your general macro section."])
 		end
@@ -211,9 +208,9 @@ function DrinkIt:Scan()
 								self:NewBest('mstone', itemID, itemCount, isPercent, health, mana)
 							end
 						end
-						-------------
-						--Manastone--
-						-------------
+						------------
+						--Bandages--
+						------------
 						if string.match(spellName,L["first aid"]:lower()) and string.match(desc,L["heals"]:lower()) then
 							local isPercent, health, mana = self:ScanSpell(desc)
 							if health > 0 and mana == 0 and (not bests['bandage']['id'] or (bests['bandage']['id'] and ((not bests['bandage']['isPercent'] and isPercent) or (bests['bandage']['isPercent'] == isPercent and bests['bandage']['health'] < health)))) then
@@ -299,25 +296,26 @@ function DrinkIt:Scan()
 	end
 
 	--Debug Output
-	self:Print(''..(bests['hstone']['id'] or '')..' - '..(bests['mstone']['id'] or '')..' - '..(bests['bandage']['id'] or '')..' || '..(bests['conjref']['id'] or '')..' - '..(bests['conjfood']['id'] or '')..' - '..(bests['conjdrink']['id'] or '')..' || '..(bests['refresh']['id'] or '')..' - '..(bests['food']['id'] or '')..' - '..(bests['drink']['id'] or '')..' || '..(bests['bpot']['id'] or '')..' - '..(bests['hpot']['id'] or '')..' - '..(bests['mpot']['id'] or '')..' || '..(bests['home']['id'] or '')..' - '..(bests['spell1']['id'] or '')..' - '..(bests['spell2']['id'] or ''))
+	self:Print('bests: '..(bests['hstone']['id'] or '')..' - '..(bests['mstone']['id'] or '')..' - '..(bests['bandage']['id'] or '')..' || '..(bests['conjref']['id'] or '')..' - '..(bests['conjfood']['id'] or '')..' - '..(bests['conjdrink']['id'] or '')..' || '..(bests['refresh']['id'] or '')..' - '..(bests['food']['id'] or '')..' - '..(bests['drink']['id'] or '')..' || '..(bests['bpot']['id'] or '')..' - '..(bests['hpot']['id'] or '')..' - '..(bests['mpot']['id'] or '')..' || '..(bests['home']['id'] or '')..' - '..(bests['spell1']['id'] or '')..' - '..(bests['spell2']['id'] or ''))
 
-	self:Edit(MACRO_NAME_HEALTH, MACRO_BODY_HEALTH, (bests['conjref']['id'] or bests['conjfood']['id'] or bests['refresh']['id'] or bests['food']['id'] or bests['bandage']['id'] or bests['hstone']['id'] or bests['bpot']['id'] or bests['hpot']['id']), (bests['hpot']['id'] or bests['bpot']['id']), bests['hstone']['id'], bests['home']['id'], bests['spell1']['name'])
+	self:MacroEdit(MACRO_NAME_HEALTH, MACRO_BODY_HEALTH, (bests['conjref']['id'] or bests['conjfood']['id'] or bests['refresh']['id'] or bests['food']['id'] or bests['bandage']['id'] or bests['hstone']['id'] or bests['bpot']['id'] or bests['hpot']['id']), (bests['hpot']['id'] or bests['bpot']['id']), bests['hstone']['id'], bests['bandage']['id'], bests['home']['id'], bests['spell1']['name'])
 
-	self:Edit(MACRO_NAME_MANA, MACRO_BODY_MANA, (bests['conjdrink']['id'] or bests['drink']['id'] or bests['mstone']['id'] or bests['mpot']['id']), (bests['mstone']['id'] or bests['mpot']['id']), bests['mstone']['id'], bests['home']['id'], bests['spell2']['name'])
+	self:MacroEdit(MACRO_NAME_MANA, MACRO_BODY_MANA, (bests['conjdrink']['id'] or bests['drink']['id'] or bests['mstone']['id'] or bests['mpot']['id'] or bests['bandage']['id']), (bests['mstone']['id'] or bests['mpot']['id']), bests['mstone']['id'], nil, bests['home']['id'], bests['spell2']['name'])
 
 	dirty = false
 end
 
 
-function DrinkIt:Edit(name, substring, food, pot, stone, bandage, home, spell)
+function DrinkIt:MacroEdit(name, substring, food, pot, stone, bandage, home, spell)
 	local macroID = GetMacroIndexByName(name)
 	if not macroID then return end
-	
+
+	local items ={stone, pot, bandage}
 	local body = ''
 	local conds = ''
 	local nomod = 'nomod'
-	if spell and not bandage then conds[nomod] = cond[nomod]..':ctrl' end
-	if not spell and bandage then conds[nomod] = cond[nomod]..':shift' end
+	if spell and not bandage then nomod = nomod..':ctrl' end
+	if not spell and bandage then nomod = nomod..':shift' end
 
 	if spell then
 		body = body..'/cast [mod:ctrl]'..spell..'\n'
@@ -335,9 +333,14 @@ function DrinkIt:Edit(name, substring, food, pot, stone, bandage, home, spell)
 	if not ((pot and not stone and not bandage) or (not pot and stone and not bandage) or (not pot and not stone and bandage)) and (pot or stone or bandage) then
 		body = body..'/castsequence '..conds..'reset=120/combat '
 		local isFirst = true
-		for local item in {stone, pot, bandage} do
-			if not isFirst then body = body..',' end
-			body = body..'item:'..item
+		for _, item in pairs(items) do
+			if item then
+				if not isFirst then
+					body = body..','
+					isFirst = false
+				end
+				body = body..'item:'..item
+			end
 		end
 		body = body..'\n'
 	end
@@ -358,20 +361,18 @@ end
 
 
 function DrinkIt:ScanValue(desc, isPercent, key)
-	local v1, v2, v3
 	if (isPercent) then
-		v1, v2, v3 = string.match(desc, '(%d*).?(%d*).?(%d+)%s-%%.-'..key:lower())
+		return string.match(desc, '(%d*).?(%d*).?(%d+)%s-%%.-'..key:lower())
 	else
-		v1, v2, v3 = string.match(desc, '(%d*).?(%d*).?(%d+).-'..key:lower())
+		return string.match(desc, '(%d*).?(%d*).?(%d+).-'..key:lower())
 	end
-	return v1, v2, v3
 end
 
 
 function DrinkIt:ScanSpell(desc)
 	local isPercent = string.match(desc, '%%') ~= nil
 	local h1, h2, h3, m1, m2, m3
-	local health, mana = 0, 0
+	local health, mana
 	h1, h2, h3 = self:ScanValue(desc, isPercent, L["health"])
 	if not h3 then
 		h1, h2, h3 = self:ScanValue(desc, isPercent, L["life"])
@@ -379,24 +380,12 @@ function DrinkIt:ScanSpell(desc)
 	if not h3 then
 		h1, h2, h3 = self:ScanValue(desc, isPercent, L["damage"])
 	end
-	h1, h2, h3 = self:ScanValue(desc, isPercent, L["mana"])
-	if h3 then
-		health = tonumber(h3)
-		if h2 then
-			health = tonumber(h2..h3)
-			if h1 then
-				health = tonumber(h1..h2..h3)
-			end
-		end
-	end
-	if m3 then
-		mana = tonumber(m3)
-		if m2 then
-			mana = tonumber(m2..m3)
-			if m1 then
-				mana = tonumber(m1..m2..m3)
-			end
-		end
-	end
+	m1, m2, m3 = self:ScanValue(desc, isPercent, L["mana"])
+	health = tonumber((h1 or '')..(h2 or '')..(h3 or '0'))
+	mana = tonumber((m1 or '')..(m2 or '')..(m3 or '0'))
+
+	--Debug Output
+	self:Print('scan: ', health, mana)
+
 	return isPercent, health, mana
 end
