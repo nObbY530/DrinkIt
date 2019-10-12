@@ -27,6 +27,7 @@ bests['bpot'] = {}
 bests['hpot'] = {}
 bests['mpot'] = {}
 local dirty = true
+local called = false
 
 local locale = GetLocale()
 local gameLocale = locale or 'enUS'
@@ -104,18 +105,28 @@ function DrinkIt:PLAYER_REGEN_ENABLED()
 end
 
 
-function DrinkIt:PLAYER_REGEN_ENABLED()
+function DrinkIt:PLAYER_LEVEL_UP()
+	self:BAG_UPDATE()
+end
+
+
+function DrinkIt:ITEM_PUSH()
 	self:BAG_UPDATE()
 end
 
 
 function DrinkIt:BAG_UPDATE()
-	self:UnregisterEvent('BAG_UPDATE')
 	dirty = true
-	if not InCombatLockdown() then self:Scan() end
-	C_Timer.NewTimer(RESET_TIME, function () self:RegisterEvent('BAG_UPDATE') end)
+	if not called then
+		called = true
+		if not InCombatLockdown() then
+			self:Scan()
+		end
+		C_Timer.NewTimer(RESET_TIME, function ()
+			called = false
+		end)
+	end
 end
-DrinkIt.PLAYER_LEVEL_UP = DrinkIt.BAG_UPDATE
 
 function DrinkIt:NewBest(sort, id, count, isPercent, health, mana)
 	bests[sort]['id'] = id
