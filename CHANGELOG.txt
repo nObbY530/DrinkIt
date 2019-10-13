@@ -1,0 +1,6 @@
+Version:    @project-version@
+Author:     @project-author@
+Date:       @project-date-iso@
+
+Version 1.03
+ - first acceptable version after some initial problems
