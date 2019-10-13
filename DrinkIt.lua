@@ -9,6 +9,7 @@ local MACRO_NAME_MANA = 'AutoMP'
 local MACRO_BODY_HEALTH = '#showtooltip\n%MACRO%'
 local MACRO_BODY_MANA = '#showtooltip\n%MACRO%'
 local RESET_TIME = 2
+local DEBUG_ON = false
 
 local bests = {}
 bests['home'] = {}
@@ -189,7 +190,9 @@ function DrinkIt:Scan()
 				itemSubType = itemSubType and itemSubType:lower()
 
 				--Debug Output
-				--self:Print('item: '..(itemName or '')..' - '..(itemType or '')..' - '..(itemSubType or '')..' - '..(itemMinLevel or ''))
+				if DEBUG_ON then
+					self:Print('item: '..(itemName or '')..' - '..(itemType or '')..' - '..(itemSubType or '')..' - '..(itemMinLevel or ''))
+				end
 
 				if itemType and ((string.match(itemType, L["armor"]:lower()) and string.match(itemSubType, L["miscellaneous"]:lower())) or string.match(itemType, L["consumable"]:lower()) or string.match(itemType, L["miscellaneous"]:lower())) and itemMinLevel <= myLevel then
 					local spellName, spellID = GetItemSpell(itemLink)
@@ -199,7 +202,9 @@ function DrinkIt:Scan()
 					if spellName and itemSubType and desc then
 
 						--Debug Output
-						--self:Print('spell: '..(itemName or '')..' - '..(itemType or '')..' - '..(itemSubType or '')..' - '..(spellName or '')..' - '..(itemMinLevel or ''))
+						if DEBUG_ON then
+							self:Print('spell: '..(itemName or '')..' - '..(itemType or '')..' - '..(itemSubType or '')..' - '..(spellName or '')..' - '..(itemMinLevel or ''))
+						end
 
 						---------------
 						--Healthstone--
@@ -307,7 +312,9 @@ function DrinkIt:Scan()
 	end
 
 	--Debug Output
-	--self:Print('bests: '..(bests['hstone']['id'] or '')..' - '..(bests['mstone']['id'] or '')..' - '..(bests['bandage']['id'] or '')..' || '..(bests['conjref']['id'] or '')..' - '..(bests['conjfood']['id'] or '')..' - '..(bests['conjdrink']['id'] or '')..' || '..(bests['refresh']['id'] or '')..' - '..(bests['food']['id'] or '')..' - '..(bests['drink']['id'] or '')..' || '..(bests['bpot']['id'] or '')..' - '..(bests['hpot']['id'] or '')..' - '..(bests['mpot']['id'] or '')..' || '..(bests['home']['id'] or '')..' - '..(bests['spell1']['id'] or '')..' - '..(bests['spell2']['id'] or ''))
+	if DEBUG_ON then
+		self:Print('bests: '..(bests['hstone']['id'] or '')..' - '..(bests['mstone']['id'] or '')..' - '..(bests['bandage']['id'] or '')..' || '..(bests['conjref']['id'] or '')..' - '..(bests['conjfood']['id'] or '')..' - '..(bests['conjdrink']['id'] or '')..' || '..(bests['refresh']['id'] or '')..' - '..(bests['food']['id'] or '')..' - '..(bests['drink']['id'] or '')..' || '..(bests['bpot']['id'] or '')..' - '..(bests['hpot']['id'] or '')..' - '..(bests['mpot']['id'] or '')..' || '..(bests['home']['id'] or '')..' - '..(bests['spell1']['id'] or '')..' - '..(bests['spell2']['id'] or ''))
+	end
 
 	self:MacroEdit(MACRO_NAME_HEALTH, MACRO_BODY_HEALTH, (bests['conjref']['id'] or bests['conjfood']['id'] or bests['refresh']['id'] or bests['food']['id'] or bests['bandage']['id'] or bests['hstone']['id'] or bests['bpot']['id'] or bests['hpot']['id']), (bests['hpot']['id'] or bests['bpot']['id']), bests['hstone']['id'], bests['bandage']['id'], bests['home']['id'], bests['spell1']['name'])
 
@@ -373,7 +380,7 @@ end
 
 function DrinkIt:ScanValue(desc, isPercent, key)
 	if (isPercent) then
-		return string.match(desc, '(%d*).?(%d*).?(%d+)%s%%%s?[a-z()]-%s'..key:lower())
+		return string.match(desc, '(%d*).?(%d*).?(%d+)%s?%%%s?[a-z()]-%s'..key:lower())
 	else
 		return string.match(desc, '(%d*).?(%d*).?(%d+)%s?[a-z()]-%s'..key:lower())
 	end
@@ -396,7 +403,9 @@ function DrinkIt:ScanSpell(desc)
 	mana = tonumber((m1 or '')..(m2 or '')..(m3 or '0'))
 
 	--Debug Output
-	--self:Print('scan: ', health, mana)
+	if DEBUG_ON then
+		self:Print('scan: ', health, mana)
+	end
 
 	return isPercent, health, mana
 end
