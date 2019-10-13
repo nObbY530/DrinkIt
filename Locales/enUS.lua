@@ -28,6 +28,7 @@ L["heals"] = true
 L["remain seated"] = true
 L["spend at least"] = true
 L["well fed"] = true
+L["battleground"] = true
 L["health"] = true
 L["life"] = true
 L["damage"] = true

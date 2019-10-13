@@ -90,7 +90,9 @@ function DrinkIt:PLAYER_LOGIN()
 		end
 	end
 
-	C_Timer.NewTimer(RESET_TIME, function () self:Scan() end)
+	for i = 1,10 do
+		C_Timer.NewTimer(i*RESET_TIME, function () self:Scan() end)
+	end
 
 	self:UnregisterEvent('PLAYER_LOGIN')
 	self.PLAYER_LOGIN = nil
@@ -284,7 +286,7 @@ function DrinkIt:Scan()
 						-----------
 						--Potions--
 						-----------
-						if (string.match(itemSubType, L["potion"]:lower()) or string.match(spellName,L["restore"]:lower()) or string.match(spellName, L["potion"]:lower()) or string.match(itemName, L["potion"]:lower())) and string.match(desc,L["restores"]:lower()) and not (string.match(desc,L["remain seated"]:lower()) or string.match(desc,L["well fed"]:lower())) then
+						if (string.match(itemSubType, L["potion"]:lower()) or string.match(spellName,L["restore"]:lower()) or string.match(spellName, L["potion"]:lower()) or string.match(itemName, L["potion"]:lower())) and string.match(desc,L["restores"]:lower()) and not (string.match(desc,L["battleground"]:lower()) or string.match(desc,L["remain seated"]:lower()) or string.match(desc,L["well fed"]:lower())) then
 							local isPercent, health, mana = self:ScanSpell(desc)
 							----------------------
 							--Health&Mana Potion--
