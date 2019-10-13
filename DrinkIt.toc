@@ -2,8 +2,9 @@
 
 ## Title: DrinkIt
 ## Notes: Food/water macro generator
-## Author: nObbY
-## Version: 1.03
+## Author: @project-author@
+## Version: @project-version@
+## Date: @project-date-iso@
 
 Libraries\LibStub\LibStub.lua
 Libraries\AceLocale-3.0\AceLocale-3.0.lua
