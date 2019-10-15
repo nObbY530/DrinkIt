@@ -9,8 +9,8 @@ local MACRO_NAME_MANA = 'AutoMP'
 local MACRO_BODY_HEALTH = '#showtooltip\n%MACRO%'
 local MACRO_BODY_MANA = '#showtooltip\n%MACRO%'
 local RESET_TIME = 2
-local DEBUG_ON = true
-local DEBUG_SMALL = true
+local DEBUG_ON = false
+local DEBUG_SMALL = false
 
 local bests = {}
 bests['home'] = {}
