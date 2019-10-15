@@ -9,7 +9,8 @@ local MACRO_NAME_MANA = 'AutoMP'
 local MACRO_BODY_HEALTH = '#showtooltip\n%MACRO%'
 local MACRO_BODY_MANA = '#showtooltip\n%MACRO%'
 local RESET_TIME = 2
-local DEBUG_ON = false
+local DEBUG_ON = true
+local DEBUG_SMALL = true
 
 local bests = {}
 bests['home'] = {}
@@ -91,7 +92,12 @@ function DrinkIt:PLAYER_LOGIN()
 	end
 
 	for i = 1,10 do
-		C_Timer.NewTimer(i*RESET_TIME, function () self:Scan() end)
+		C_Timer.NewTimer(i*RESET_TIME, function ()
+			dirty = true
+			if not InCombatLockdown() then
+				self:Scan()
+			end
+		end)
 	end
 
 	self:UnregisterEvent('PLAYER_LOGIN')
@@ -127,6 +133,7 @@ function DrinkIt:BAG_UPDATE()
 		end
 		C_Timer.NewTimer(RESET_TIME, function ()
 			called = false
+			if dirty and not InCombatLockdown() then self:Scan() end
 		end)
 	end
 end
@@ -142,6 +149,7 @@ end
 
 function DrinkIt:Scan()
 	for _,t in pairs(bests) do for i in pairs(t) do t[i] = nil end end
+	dirty = false
 	--------------------
 	--Find your Spells--
 	--------------------
@@ -192,7 +200,7 @@ function DrinkIt:Scan()
 				itemSubType = itemSubType and itemSubType:lower()
 
 				--Debug Output
-				if DEBUG_ON then
+				if DEBUG_ON and not DEBUG_SMALL then
 					self:Print('item: '..(itemName or '')..' - '..(itemType or '')..' - '..(itemSubType or '')..' - '..(itemMinLevel or ''))
 				end
 
@@ -204,7 +212,7 @@ function DrinkIt:Scan()
 					if spellName and itemSubType and desc then
 
 						--Debug Output
-						if DEBUG_ON then
+						if DEBUG_ON and not DEBUG_SMALL then
 							self:Print('spell: '..(itemName or '')..' - '..(itemType or '')..' - '..(itemSubType or '')..' - '..(spellName or '')..' - '..(itemMinLevel or ''))
 						end
 
@@ -405,7 +413,7 @@ function DrinkIt:ScanSpell(desc)
 	mana = tonumber((m1 or '')..(m2 or '')..(m3 or '0'))
 
 	--Debug Output
-	if DEBUG_ON then
+	if DEBUG_ON and not DEBUG_SMALL then
 		self:Print('scan: ', health, mana)
 	end
 
