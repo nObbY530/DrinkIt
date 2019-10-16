@@ -10,7 +10,11 @@ local MACRO_BODY_HEALTH = '#showtooltip\n%MACRO%'
 local MACRO_BODY_MANA = '#showtooltip\n%MACRO%'
 local RESET_TIME = 2
 --@debug@
-local DEBUG_ON = true
+local DEBUG_SPELL = false
+local DEBUG_ITEM = false
+local DEBUG_ITEM_SPELL = false
+local DEBUG_SCAN = false
+local DEBUG_BESTS = false
 --@end-debug@
 
 local bests = {}
@@ -155,8 +159,9 @@ function DrinkIt:Scan()
 	--------------------
 	--Find your spells--
 	--------------------
-	bests['home']['id'] = 6948
+	self:NewBest('home', 6948, 'Hearthstone', nil, nil, nil, nil)
 	local myLevel = UnitLevel('player')
+
 	local myClassName, _, _ = UnitClass('player')
 	myClassName = myClassName and myClassName:lower()
 	local numSpells = 0
@@ -165,12 +170,21 @@ function DrinkIt:Scan()
 		numSpells = numSpells + numEntries
 	end
 	for spellIndex = 1, numSpells do
-		local spellName, _ = GetSpellBookItemName(spellIndex,'spell')
-		spellName = spellName and spellName:lower()
-		local _, _, _, _, _, _, spellID = GetSpellInfo(spellName)
+		local spellName, spellSubName = GetSpellBookItemName(spellIndex,'spell')
+		local spellID
+		if spellName then _, _, _, _, _, _, spellID = GetSpellInfo(spellName) end
 		local spellDesc = spellID and GetSpellDescription(spellID)
-		spellDesc = spellDesc and desc:lower()
+		spellName = spellName and spellName:lower()
+		spellDesc = spellDesc and spellDesc:lower()
+
 		if myClassName and spellName and spellID and spellDesc then
+
+			--@debug@
+			if DEBUG_SPELL then
+				self:Print('spell: '..(myClassName or '')..' (lvl:'..(myLevel or '')..')  '..(spellName or '')..', '..(spellSubName or '')..' - '..(spellID or ''))
+			end
+			--@end-debug@
+
 			--------------------
 			--Find mage spells--
 			--------------------
@@ -189,7 +203,7 @@ function DrinkIt:Scan()
 			--Find warlock spells--
 			-----------------------
 			if string.match(myClassName,L["warlock"]:lower()) and string.match(spellName, L["healthstone"]:lower()) then
-				local isPercent, health, mana = self:ScanSpell(desc)
+				local isPercent, health, mana = self:ScanSpell(spellDesc)
 				if health > 0 and mana == 0 and (not bests['spell1']['id'] or (bests['spell1']['id'] and ((not bests['spell1']['isPercent'] and isPercent) or (bests['spell1']['isPercent'] == isPercent and bests['spell1']['health'] < health)))) then
 					self:NewBest('spell1', spellID, spellName, nil, isPercent, health, mana)
 				end
@@ -207,7 +221,7 @@ function DrinkIt:Scan()
 				itemSubType = itemSubType and itemSubType:lower()
 
 				--@debug@
-				if DEBUG_ON then
+				if DEBUG_ITEM then
 					self:Print('item: '..(itemName or '')..' - '..(itemType or '')..' - '..(itemSubType or '')..' - '..(itemMinLevel or ''))
 				end
 				--@end-debug@
@@ -220,8 +234,8 @@ function DrinkIt:Scan()
 					if spellName and itemSubType and desc then
 
 						--@debug@
-						if DEBUG_ON then
-							self:Print('spell: '..(itemName or '')..' - '..(itemType or '')..' - '..(itemSubType or '')..' - '..(spellName or '')..' - '..(itemMinLevel or ''))
+						if DEBUG_ITEM_SPELL then
+							self:Print('item_spell: '..(itemName or '')..' - '..(spellName or ''))
 						end
 						--@end-debug@
 
@@ -331,7 +345,7 @@ function DrinkIt:Scan()
 	end
 
 	--@debug@
-	if DEBUG_ON then
+	if DEBUG_BESTS then
 		self:Print('bests: '..(bests['hstone']['name'] or '')..' - '..(bests['mstone']['name'] or '')..' - '..(bests['bandage']['name'] or '')..' || '..(bests['conjref']['name'] or '')..' - '..(bests['conjfood']['name'] or '')..' - '..(bests['conjdrink']['name'] or '')..' || '..(bests['refresh']['name'] or '')..' - '..(bests['food']['name'] or '')..' - '..(bests['drink']['name'] or '')..' || '..(bests['bpot']['name'] or '')..' - '..(bests['hpot']['name'] or '')..' - '..(bests['mpot']['name'] or '')..' || '..(bests['home']['name'] or '')..' - '..(bests['spell1']['name'] or '')..' - '..(bests['spell2']['name'] or ''))
 	end
 	--@end-debug@
@@ -423,7 +437,7 @@ function DrinkIt:ScanSpell(desc)
 	mana = tonumber((m1 or '')..(m2 or '')..(m3 or '0'))
 
 	--@debug@
-	if DEBUG_ON then
+	if DEBUG_SCAN then
 		self:Print('scan: ', health, mana)
 	end
 	--@end-debug@
