@@ -1,6 +1,9 @@
 Addon:      DrinkIt
 Author:     nObbY530
 
+Version 1.06
+ - minor fixes
+
 Version 1.05
  - fixed scan right after login/zoning/dead
 
