@@ -1,6 +1,9 @@
 Addon:      DrinkIt
 Author:     nObbY530
 
+Version 1.08
+ - minor fixes
+
 Version 1.07
  - fixed 'Create Healthstone' scan
 
