@@ -1,5 +1,6 @@
 -- German localization file for deDE.
-local L = LibStub("AceLocale-3.0"):NewLocale("DrinkIt", "deDE", false)
+local L = LibStub("AceLocale-3.0"):NewLocale("DrinkIt", "deDE")
+if not L then return end
 
 L["Created macro:"] = "Makro erstellt:"
 L["Can't create new macro:"] = "Konnte Makro nicht erstellen:"
